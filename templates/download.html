@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+    <script type="application/javascript">
+        function double_check() {
+            return confirm('Delete the selected files?');
+	}
+
+        function on_select_all() {
+            const selector = document.getElementById("selectall");
+            const entries = document.getElementsByClassName("entry");
+	    for (let i=0; i < entries.length; i++) {
+		e = entries.item(i);
+		console.log(e.checked);
+                e.checked = selector.checked;
+	    }
+	}
+
+    </script>
+    <form method="post" >
+	<div class="info">
+            Note: Selected files (even if it is just one) will be combined into a .zip file before downloading. Some browsers consider .zip archives to be unsafe. You may have to verify the download.
+	</div>
+
+	<input type="checkbox" name="selectall" value="selectall" id="selectall" onclick="on_select_all()"/> Select All
+	<hr>
+        {% for file in files %} 
+            <div class="download_entry">
+            <input type="checkbox" name="entry" value="{{ file}}" class="entry"/> {{ file }}
+	    </div> 
+        {% endfor %}
+        <input type="submit" name="action" value="download"/> <input type="submit" name="action" value="delete"  onclick="return double_check();" />
+    </form>
+{% endblock content %}
+
+

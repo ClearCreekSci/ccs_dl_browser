@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<form method="POST" action="">
+    {{ form.csrf_token }}
+    {% if form.errors %}
+        <div class="form_errors">
+		{{ form.errors }}
+	</div>
+    {% endif %}
+    <div class="units_field">
+        {{ form.units.label(class="units_label") }}
+        {{ form.units }}
+    </div>
+    <div class="frequency_field">
+        {{ form.frequency.label(class="frequency_label") }}
+        {{ form.frequency }}
+    </div>
+    <div class="package_rate_field">
+        {{ form.package_rate.label(class="package_rate_label") }}
+        {{ form.package_rate }}
+    </div>
+    {{ form.submit }}
+</form>
+{% endblock content %}

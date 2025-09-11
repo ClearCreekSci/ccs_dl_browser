@@ -1,0 +1,82 @@
+body {
+    background: #fafafa;
+    color: #333333;
+    margin-top: 1em;
+}
+
+div.header {
+    color: white;
+    background-color: #29abca;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    text-align: center;
+}
+
+div.navbar {
+    background-color: white;
+    border-color: black;
+    text-align: center;
+    padding-top: 1%;
+    padding-bottom: 1%;
+}
+
+a.nav-item {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+span.data_label {
+    font-size: 200%;
+    font-weight: bold;
+}
+
+span.data_value {
+    font-size: 200%;
+}
+
+table.history {
+    text-align: center;
+}
+
+td.history_header {
+    font-weight: bold;
+}
+
+div.download_history {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+div.info {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+div.units_field {
+}
+
+div.frequency_field {
+    padding-bottom: 0.25em;
+}
+
+div.package_rate_field {
+    padding-bottom: 1em;
+}
+
+.settings_submit {
+    padding-top: 0.25em;
+}
+
+
+.units_label {
+    font-weight: bold;
+}
+
+.frequency_label {
+    font-weight: bold;
+}
+
+.package_rate_label {
+    font-weight: bold;
+}
+

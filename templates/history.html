@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+    <table class="history" border="1">
+        {% set ns = namespace(firstrow = True) %}
+        {% for row in data %}
+	    {% if ns.firstrow %}
+                <tr>
+	        {% for col in row %}
+		    <th class="history_header">{{ col }}</th>
+                {% endfor %}
+		{% set ns.firstrow = False %}
+                </tr>
+	    {% else %}
+                <tr>
+	        {% for col in row %}
+		    <td>{{ col }}</td>
+                {% endfor %}
+                </tr>
+	    {% endif %}
+        {% endfor %}
+    </table>
+{% endblock content %}

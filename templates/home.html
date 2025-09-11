@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for d in data %}
+    <div class="data"><span class="data_label">{{ d[0] }}: </span><span class="data_value">{{ d[1] }}</span></div>
+    {% endfor %}
+{% endblock content %}
