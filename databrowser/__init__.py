@@ -8,7 +8,7 @@ VERSION = 1
 
 app = Flask('DataBrowser')
 
-datapath = '/opt/ccs/WeatherLogger/data'
+datapath = '/opt/ccs/WeatherDataLogger/data'
 
 cfg = config.Settings()
 app.config['SECRET_KEY'] = cfg.secret
