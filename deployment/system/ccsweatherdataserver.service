@@ -1,0 +1,14 @@
+[Unit]
+Description=Clear Creek Scientific Weather Data Server
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+WorkingDirectory=/opt/ccs/WeatherDataServer
+ExecStart=/opt/ccs/venv_weatherdataserver/bin/python3 /opt/ccs/WeatherDataServer/run.py
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=default.target
+
