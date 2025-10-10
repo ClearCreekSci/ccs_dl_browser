@@ -15,9 +15,9 @@ from flask import send_file
 
 
 from databrowser import app
-from databrowser import VERSION
 from databrowser import datapath
 from databrowser import cfg
+from databrowser import mnfst
 
 from databrowser import ccs
 
@@ -265,7 +265,7 @@ def settings():
 
 @app.route('/about')
 def about():
-    return render_template('about.html',version=VERSION,title='About')
+    return render_template('about.html',version=mnfst.version,commit=mnfst.commit,title='About')
 
 #FIXME: error checking needs to be done...
 @app.route('/downloadfile/<name>')
