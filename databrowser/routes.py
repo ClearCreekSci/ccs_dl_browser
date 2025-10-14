@@ -12,12 +12,18 @@ from flask import redirect
 from flask import url_for
 from flask import request
 from flask import send_file
+from flask_login import login_user
+from flask_login import logout_user
+from flask_login import current_user
+from flask_login import login_required
 
 
 from databrowser import app
 from databrowser import datapath
 from databrowser import cfg
 from databrowser import mnfst
+from databrowser import bcrypt
+from databrowser.models import Admin
 
 from databrowser import ccs
 
@@ -38,7 +44,7 @@ def get_most_recent_file_path(dirpath):
     return rv
 
 def parse_most_recent():
-    global cfg
+    #global cfg
     rv = list()
     header = None
     data = None
@@ -66,7 +72,7 @@ def parse_most_recent():
     return rv
 
 def parse_data():
-    global cfg
+    #global cfg
     rv = list()
     data = None
     files = os.listdir(datapath)
@@ -111,7 +117,7 @@ def parse_data():
     return rv
 
 def download_files(entries):
-    global cfg
+    #global cfg
 
     if 0 == len(entries):
         return render_template('download.html',title='Download',files=os.listdir(datapath))
@@ -231,6 +237,7 @@ def graphs():
     return render_template('graphs.html',title='Graphs')
 
 @app.route('/download',methods=['GET','POST'])
+@login_required
 def download():
     remove_leftovers()
     if 'POST' == request.method:
@@ -242,17 +249,24 @@ def download():
     return render_template('download.html',title='Download',files=os.listdir(datapath))
 
 @app.route('/settings',methods=['GET','POST'])
+@login_required
 def settings():
-    global cfg
+    #global cfg
     form = forms.SettingsForm()
+    #form.errors = list()
     if form.validate_on_submit():
+        print("Settings form validated!");
         if form.units.data == forms.METRIC_VALUE:
             cfg.use_metric = True
         else:
             cfg.use_metric = False
         cfg.frequency = int(form.frequency.data)
         cfg.package_rate = calculate_package_rate(int(form.package_rate.data),form.frequency.data)
+        if len(form.password.data) > 0:
+            cfg.passwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            logout_user()
         cfg.write()
+        return redirect(url_for('home'))
     else:
         if cfg.use_metric:
             form.units.default = forms.METRIC_VALUE
@@ -269,11 +283,30 @@ def about():
 
 #FIXME: error checking needs to be done...
 @app.route('/downloadfile/<name>')
+@login_required
 def downloadfile(name):
     data = None
     path = os.path.join(datapath,name)
     with open(path,'rb') as fd:
         data = fd.read()
     return send_file(BytesIO(data),download_name=name,as_attachment=True) 
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+    #global cfg
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = forms.LoginForm()
+    if form.validate_on_submit():
+        password = form.password.data
+        user = Admin()
+        if bcrypt.check_password_hash(cfg.passwd,password):
+            login_user(user,True)
+            next_page = request.args.get('next')
+            if None is not next_page:
+                return redirect(next_page)
+            else:
+                return redirect(url_for('home'))
+    return render_template('login.html',title='Login',form=form)
 
 

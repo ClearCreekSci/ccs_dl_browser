@@ -3,21 +3,31 @@
 <form method="POST" action="">
     {{ form.csrf_token }}
     {% if form.errors %}
-        <div class="form_errors">
-		{{ form.errors }}
-	</div>
+	    {% for err in form.errors %}
+                <div class="form_errors">
+		    {{ err }}
+	        </div>
+	    {% endfor %}
     {% endif %}
-    <div class="units_field">
+    <div class="form_group">
         {{ form.units.label(class="units_label") }}
         {{ form.units }}
     </div>
-    <div class="frequency_field">
+    <div class="form_group">
         {{ form.frequency.label(class="frequency_label") }}
         {{ form.frequency }}
     </div>
-    <div class="package_rate_field">
+    <div class="form_group">
         {{ form.package_rate.label(class="package_rate_label") }}
         {{ form.package_rate }}
+    </div>
+    <div class="form_group">
+        {{ form.password.label(class="password_label") }}
+        {{ form.password }}
+    </div>
+    <div class="form_group">
+        {{ form.confirm_password.label(class="password_label") }}
+        {{ form.confirm_password }}
     </div>
     {{ form.submit }}
 </form>

@@ -52,17 +52,6 @@ div.info {
     padding-bottom: 1em;
 }
 
-div.units_field {
-}
-
-div.frequency_field {
-    padding-bottom: 0.25em;
-}
-
-div.package_rate_field {
-    padding-bottom: 1em;
-}
-
 .settings_submit {
     padding-top: 0.25em;
 }
@@ -76,7 +65,19 @@ div.package_rate_field {
     font-weight: bold;
 }
 
+.password_label {
+    font-weight: bold;
+}
+
 .package_rate_label {
     font-weight: bold;
 }
 
+.form_errors {
+    font-weight: bold;
+    color: red;
+}
+
+.form_group {
+    padding-bottom: 0.25em;
+}
