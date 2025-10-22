@@ -1,4 +1,4 @@
-```
+'''
     ccs.py
     OpenSCAD model for the CCS Data Logger enclosure
 
@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-```
+'''
 
 CCS_AIR_TEMPERATURE_UUID    = 'a0ce0210-3bbf-11ee-89eb-00e04c400cc5'
 CCS_HUMIDITY_UUID           = 'a0ce0211-3bbf-11ee-89eb-00e04c400cc5'
