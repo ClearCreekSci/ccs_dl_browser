@@ -244,13 +244,19 @@ def calculate_package_index(package_rate,frequency):
 @app.route('/')
 @app.route('/home')
 def home():
-    d = parse_most_recent() 
-    return render_template('home.html',title='Home',data=d)
+    d = parse_most_recent()
+    if len(d) > 0:
+        return render_template('home.html',title='Home',data=d)
+    else:
+        return render_template('home.html',title='Home',data=None)
 
 @app.route('/history')
 def history():
     d = parse_data()
-    return render_template('history.html',title='History',data=d)
+    if len(d) > 0:
+        return render_template('history.html',title='History',data=d)
+    else:
+        return render_template('home.html',title='Home',data=None)
 
 @app.route('/graphs')
 def graphs():
