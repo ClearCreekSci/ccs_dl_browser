@@ -233,9 +233,9 @@ def calculate_package_index(package_rate,frequency):
         rv = forms.PKG_15_MIN
     elif x <= 30:
         rv = forms.PKG_30_MIN 
-    elif x <= 1440:
+    elif x <= 60:
         rv = forms.PKG_HOURLY 
-    elif x <= 34560:
+    elif x <= 1440:
         rv = forms.PKG_DAILY 
     else:
         rv = forms.PKG_WEEKLY 
@@ -281,7 +281,7 @@ def settings():
         else:
             cfg.use_metric = False
         cfg.frequency = int(form.frequency.data)
-        cfg.package_rate = calculate_package_rate(int(form.package_rate.data),form.frequency.data)
+        cfg.package_rate = calculate_package_rate(int(form.package_rate.data),int(form.frequency.data))
         if len(form.password.data) > 0:
             cfg.passwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             logout_user()

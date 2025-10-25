@@ -1,5 +1,5 @@
 VERSION="NotForRelease"
-PREFIX="WeatherDataServer_Install_Bundle"
+PREFIX="DataServer_Install_Bundle"
 
 if [ $# -eq 1 ]; then
     VERSION="$1"
@@ -7,7 +7,8 @@ fi
 
 ./make_manifest.sh $VERSION > ./manifest.xml
 
-zip -r "${PREFIX}_version_${VERSION}.zip" ./manifest.xml ../run.py ../requirements.txt ../databrowser ../ccs_dlconfig ../static ../templates ./system
+rm -rf ../databrowser/__pycache__
+zip -r "${PREFIX}_v${VERSION}.zip" ./manifest.xml ../run.py ../requirements.txt ../databrowser ../ccs_dlconfig/config.py ../ccs_dlconfig/manifest.py ../static ../templates ./system
 
 
 
