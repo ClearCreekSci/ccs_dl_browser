@@ -39,7 +39,6 @@ from flask_login import login_required
 
 
 from databrowser import app
-from databrowser import datapath
 from databrowser import cfg
 from databrowser import mnfst
 from databrowser import bcrypt
@@ -68,7 +67,7 @@ def parse_most_recent():
     rv = list()
     header = None
     data = None
-    datafile = get_most_recent_file_path(datapath)
+    datafile = get_most_recent_file_path(cfg.data_dir)
     if None is not datafile:
         with open(datafile,'r') as fd:
             for line in fd:
@@ -95,13 +94,13 @@ def parse_data():
     #global cfg
     rv = list()
     data = None
-    files = os.listdir(datapath)
+    files = os.listdir(cfg.data_dir)
     files.sort()
     fidx = 0
 
     for f in files:
         header = None
-        datafile = os.path.join(datapath,f)
+        datafile = os.path.join(cfg.data_dir,f)
         with open(datafile,'r') as fd:
             for line in fd:
                 if None is header:
@@ -140,12 +139,12 @@ def download_files(entries):
     #global cfg
 
     if 0 == len(entries):
-        return render_template('download.html',title='Download',files=os.listdir(datapath))
+        return render_template('download.html',title='Download',files=os.listdir(cfg.data_dir))
     ts = datetime.now()
     dst = ts.strftime('%Y%m%d%I%M%S') + DOWNLOAD_SUFFIX
     with zipfile.ZipFile(dst,'w',zipfile.ZIP_DEFLATED) as zippy: 
         for entry in entries:
-            path = os.path.join(datapath,entry)
+            path = os.path.join(cfg.data_dir,entry)
             with open(path,'rt') as fd:
                 data = ''
                 header = list()
@@ -197,7 +196,7 @@ def download_files(entries):
 
 def delete_files(entries):
     for entry in entries:
-        path = os.path.join(datapath,entry)
+        path = os.path.join(cfg.data_dir,entry)
         if os.path.exists(path):
             pathlib.Path.unlink(path)
 
@@ -272,7 +271,7 @@ def download():
             return download_files(entries)
         elif 'delete' == request.form['action']:
             delete_files(entries)
-    return render_template('download.html',title='Download',files=os.listdir(datapath))
+    return render_template('download.html',title='Download',files=os.listdir(cfg.data_dir))
 
 @app.route('/settings',methods=['GET','POST'])
 @login_required
@@ -312,7 +311,7 @@ def about():
 @login_required
 def downloadfile(name):
     data = None
-    path = os.path.join(datapath,name)
+    path = os.path.join(cfg.data_dir,name)
     with open(path,'rb') as fd:
         data = fd.read()
     return send_file(BytesIO(data),download_name=name,as_attachment=True) 

@@ -24,18 +24,20 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 
-from ccs_dlconfig import config
 from ccs_dlconfig import manifest
+
 
 app = Flask('DataBrowser')
 
-datapath = '/opt/ccs/WeatherDataLogger/data'
-configpath = '/opt/ccs/WeatherDataLogger/settings.cfg'
-
+configpath = '/opt/ccs/WeatherDataServer/settings.cfg'
+manifestpath = '/opt/ccs/WeatherDataServer/manifest.xml'
 defaultpassword = 'MeasureYourWorld'
 
-cfg = config.Settings(configpath)
-mnfst = manifest.Manifest()
+from databrowser import dbconfig
+cfg = dbconfig.DBSettings()
+cfg.read(configpath)
+
+mnfst = manifest.Manifest(manifestpath)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
