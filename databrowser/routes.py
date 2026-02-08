@@ -44,7 +44,7 @@ from databrowser import mnfst
 from databrowser import bcrypt
 from databrowser.models import Admin
 
-from databrowser import ccs
+from databrowser import ccs_base
 
 from databrowser import forms
 
@@ -85,8 +85,10 @@ def parse_most_recent():
                         idx += 1
                         continue
                     hp = hp.strip()
-                    v = (ccs.getName(hp),ccs.getValue(hp,data_parts[idx],cfg.use_metric) + ' ' + ccs.getUnits(hp,cfg.use_metric))
-                    rv.append(v)
+                    label = ccs_base.getName(hp)
+                    value = ccs_base.getValue(hp,data_parts[idx],cfg.use_metric)
+                    value += ' ' + ccs_base.getUnits(hp,cfg.use_metric)
+                    rv.append((label,value))
                     idx += 1
     return rv
 
@@ -110,11 +112,11 @@ def parse_data():
                     for part in parts:
                         part = part.strip()
                         header.append(part)
-                        name = ccs.getName(part)
-                        if ccs.UNKNOWN == name:
+                        name = ccs_base.getName(part)
+                        if ccs_base.UNKNOWN == name:
                             cooked_header.append(part)
                         else:
-                            s = name + ' ' + ccs.getUnits(part,cfg.use_metric)
+                            s = name + ' ' + ccs_base.getUnits(part,cfg.use_metric)
                             cooked_header.append(s)
                     if fidx == 0:
                         rv.append(cooked_header)
@@ -124,11 +126,11 @@ def parse_data():
                     didx = 0
                     for part in parts:
                         part = part.strip()
-                        name = ccs.getName(header[didx])
-                        if name == ccs.UNKNOWN: 
+                        name = ccs_base.getName(header[didx])
+                        if name == ccs_base.UNKNOWN: 
                             data.append(part)
                         else:
-                            v = ccs.getValue(header[didx],part,cfg.use_metric)
+                            v = ccs_base.getValue(header[didx],part,cfg.use_metric)
                             data.append(str(v))
                         didx += 1
                     rv.append(data)
@@ -156,14 +158,14 @@ def download_files(entries):
                             part = part.strip()
                             s = ''
                             header.append(part)   
-                            name = ccs.getName(part)
-                            if ccs.UNKNOWN == name:
+                            name = ccs_base.getName(part)
+                            if ccs_base.UNKNOWN == name:
                                 if 0 == idx:
                                     s = part
                                 else:
                                     s = ',' + part
                             else:
-                                units = ccs.getUnits(part,cfg.use_metric)
+                                units = ccs_base.getUnits(part,cfg.use_metric)
                                 if 0 == idx:
                                     s = name + ' ' + units
                                 else:
@@ -176,17 +178,17 @@ def download_files(entries):
                         for part in parts:
                             s = ''
                             part = part.strip()
-                            name = ccs.getName(header[idx])
+                            name = ccs_base.getName(header[idx])
                             if 0 == idx:
-                                if ccs.UNKNOWN == name:
+                                if ccs_base.UNKNOWN == name:
                                     s = part
                                 else:
-                                    s = ccs.getValue(header[idx],part,cfg.use_metric)
+                                    s = ccs_base.getValue(header[idx],part,cfg.use_metric)
                             else:
-                                if ccs.UNKNOWN == name:
+                                if ccs_base.UNKNOWN == name:
                                     s = ',' + part
                                 else:
-                                    s = ',' +  ccs.getValue(header[idx],part,cfg.use_metric)
+                                    s = ',' +  ccs_base.getValue(header[idx],part,cfg.use_metric)
                             data += s
                             idx += 1
                         data += '\n'
