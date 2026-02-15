@@ -1,0 +1,21 @@
+
+.grid-container {
+    display: grid;
+    grid: repeat(auto-fill, 5em) / auto-flow 1fr;
+    height: 100vh;
+    grid-gap: 0.5em;
+}
+
+.grid-next {
+    display: grid;
+    main {
+        grid: auto-flow 1fr /repeat(auto-fill, 2em);
+    }
+    outline: 1px dashed blue;
+}
+
+.thumb {
+    float: top;
+    width: 64px;
+    height: 64px;
+}

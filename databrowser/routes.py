@@ -259,6 +259,24 @@ def history():
     else:
         return render_template('home.html',title='Home',data=None)
 
+def get_photos():
+    global cfg
+    rv = list()
+    # FIXME:
+    files = os.listdir('/opt/ccs/DataLogger/photos')
+    for f in files:
+       target = os.path.join('/opt/ccs/DataLogger/photos',f)
+       link = os.path.join('/home/winslow/base/ccs/dev/software/linux/ccs_dl_browser/static/photos',f)
+       if False == os.path.islink(link) or False == os.path.exists(link):
+           os.symlink(target,link)
+       rv.append((f,'photos/' + f,target))
+    return rv
+
+@app.route('/photos')
+def photos():
+    v = get_photos()
+    return render_template('photos.html',title='Photos',data=v)
+
 @app.route('/graphs')
 def graphs():
     return render_template('graphs.html',title='Graphs')

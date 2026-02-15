@@ -4,6 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='photos.css') }}">
 
   {% if title %}
     <title>DataBrowser - {{ title }}</title>
@@ -19,6 +20,7 @@
   <div class="navbar">
       <a class="nav-item" href="{{ url_for('home') }}">Home</a>
       <a class="nav-item" href="{{ url_for('history') }}">History</a>
+      <a class="nav-item" href="{{ url_for('photos') }}">Photos</a>
       <!-- <a class="nav-item" href="{{ url_for('graphs') }}">Graphs</a> -->
       <a class="nav-item" href="{{ url_for('download') }}">Download</a>
       <a class="nav-item" href="{{ url_for('settings') }}">Settings</a>
