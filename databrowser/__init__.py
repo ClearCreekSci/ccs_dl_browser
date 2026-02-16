@@ -29,15 +29,19 @@ from ccs_dlconfig import manifest
 
 app = Flask('DataBrowser')
 
-configpath = '/opt/ccs/WeatherDataServer/settings.cfg'
-manifestpath = '/opt/ccs/WeatherDataServer/manifest.xml'
+configpath = os.environ['CCS_DS_CFG_PATH']
+manifestpath = os.environ['CCS_DS_MAN_PATH']
 defaultpassword = 'MeasureYourWorld'
 
 from databrowser import dbconfig
 cfg = dbconfig.DBSettings()
 cfg.read(configpath)
 
-mnfst = manifest.Manifest(manifestpath)
+try:
+    mnfst = manifest.Manifest(manifestpath)
+except FileNotFoundError:
+    mnfst = None
+
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'

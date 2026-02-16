@@ -5,7 +5,7 @@ StartLimitBurst=5
 
 [Service]
 WorkingDirectory=/opt/ccs/WeatherDataServer
-ExecStart=/opt/ccs/venv_weatherdataserver/bin/python3 /opt/ccs/WeatherDataServer/run.py
+ExecStart=CCS_DS_CFG_PATH=/opt/ccs/DataServer/settings.cfg CCS_DS_MAN_PATH=/opt/ccs/DataServer/manifest.xml /opt/ccs/venv_weatherdataserver/bin/python3 /opt/ccs/WeatherDataServer/run.py
 Restart=on-failure
 RestartSec=10s
 

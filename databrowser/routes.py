@@ -41,6 +41,7 @@ from flask_login import login_required
 from databrowser import app
 from databrowser import cfg
 from databrowser import mnfst
+ 
 from databrowser import bcrypt
 from databrowser.models import Admin
 
@@ -67,7 +68,7 @@ def parse_most_recent():
     rv = list()
     header = None
     data = None
-    datafile = get_most_recent_file_path(cfg.data_dir)
+    datafile = get_most_recent_file_path(cfg.csv_dir)
     if None is not datafile:
         with open(datafile,'r') as fd:
             for line in fd:
@@ -96,13 +97,13 @@ def parse_data():
     #global cfg
     rv = list()
     data = None
-    files = os.listdir(cfg.data_dir)
+    files = os.listdir(cfg.csv_dir)
     files.sort()
     fidx = 0
 
     for f in files:
         header = None
-        datafile = os.path.join(cfg.data_dir,f)
+        datafile = os.path.join(cfg.csv_dir,f)
         with open(datafile,'r') as fd:
             for line in fd:
                 if None is header:
@@ -141,12 +142,12 @@ def download_files(entries):
     #global cfg
 
     if 0 == len(entries):
-        return render_template('download.html',title='Download',files=os.listdir(cfg.data_dir))
+        return render_template('download.html',title='Download',files=os.listdir(cfg.csv_dir))
     ts = datetime.now()
     dst = ts.strftime('%Y%m%d%I%M%S') + DOWNLOAD_SUFFIX
     with zipfile.ZipFile(dst,'w',zipfile.ZIP_DEFLATED) as zippy: 
         for entry in entries:
-            path = os.path.join(cfg.data_dir,entry)
+            path = os.path.join(cfg.csv_dir,entry)
             with open(path,'rt') as fd:
                 data = ''
                 header = list()
@@ -198,7 +199,7 @@ def download_files(entries):
 
 def delete_files(entries):
     for entry in entries:
-        path = os.path.join(cfg.data_dir,entry)
+        path = os.path.join(cfg.csv_dir,entry)
         if os.path.exists(path):
             pathlib.Path.unlink(path)
 
@@ -210,6 +211,9 @@ def remove_leftovers():
         if file.endswith('.zip'):
             pathlib.Path.unlink(file)
 
+# We have moved configuration of frequency and package rate to the data logger
+# We no longer use two "package" functions here, but may want to move them to 
+# the data logger configuration application when it is written...
 def calculate_package_rate(index,frequency):
     rv = 0
     if forms.PKG_15_MIN == index:
@@ -263,11 +267,13 @@ def get_photos():
     global cfg
     rv = list()
     # FIXME:
-    files = os.listdir('/opt/ccs/DataLogger/photos')
+    files = os.listdir(cfg.photos_dir)
     for f in files:
-       target = os.path.join('/opt/ccs/DataLogger/photos',f)
-       link = os.path.join('/home/winslow/base/ccs/dev/software/linux/ccs_dl_browser/static/photos',f)
-       if False == os.path.islink(link) or False == os.path.exists(link):
+       target = os.path.join(cfg.photos_dir,f)
+       cwd = os.getcwd()
+       link = os.path.join(cwd,'static/photos')
+       link = os.path.join(link,f)
+       if False == os.path.exists(link) or False == os.path.islink(link):
            os.symlink(target,link)
        rv.append((f,'photos/' + f,target))
     return rv
@@ -291,7 +297,7 @@ def download():
             return download_files(entries)
         elif 'delete' == request.form['action']:
             delete_files(entries)
-    return render_template('download.html',title='Download',files=os.listdir(cfg.data_dir))
+    return render_template('download.html',title='Download',files=os.listdir(cfg.csv_dir))
 
 @app.route('/settings',methods=['GET','POST'])
 @login_required
@@ -305,8 +311,6 @@ def settings():
             cfg.use_metric = True
         else:
             cfg.use_metric = False
-        cfg.frequency = int(form.frequency.data)
-        cfg.package_rate = calculate_package_rate(int(form.package_rate.data),int(form.frequency.data))
         if len(form.password.data) > 0:
             cfg.passwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             logout_user()
@@ -317,21 +321,22 @@ def settings():
             form.units.default = forms.METRIC_VALUE
         else:
             form.units.default = forms.IMPERIAL_VALUE
-        form.frequency.default = str(cfg.frequency)
-        form.package_rate.default = str(calculate_package_index(cfg.package_rate,cfg.frequency))
         form.process()
     return render_template('settings.html',title='Settings',form=form)
 
 @app.route('/about')
 def about():
-    return render_template('about.html',version=mnfst.version,commit=mnfst.commit,title='About')
+    if None == mnfst:
+        return render_template('about.html',version='unknown',commit='unknown',title='About')
+    else:
+        return render_template('about.html',version=mnfst.version,commit=mnfst.commit,title='About')
 
 #FIXME: error checking needs to be done...
 @app.route('/downloadfile/<name>')
 @login_required
 def downloadfile(name):
     data = None
-    path = os.path.join(cfg.data_dir,name)
+    path = os.path.join(cfg.csv_dir,name)
     with open(path,'rb') as fd:
         data = fd.read()
     return send_file(BytesIO(data),download_name=name,as_attachment=True) 
