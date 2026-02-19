@@ -1,6 +1,6 @@
 '''
     __init__.py
-    OpenSCAD model for the CCS Data Logger enclosure
+    Package file for the CCS Data Server databrowser
 
     Copyright (C) 2025 Clear Creek Scientific
 
@@ -25,7 +25,6 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 
 from ccs_dlconfig import manifest
-
 
 app = Flask('DataBrowser')
 

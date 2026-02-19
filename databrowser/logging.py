@@ -1,6 +1,6 @@
 '''
-    models.py
-    Data models for the CCS Data Server
+    logging.py
+    logging for the Data Server 
 
     Copyright (C) 2026 Clear Creek Scientific
 
@@ -17,23 +17,26 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
+import os
+import datetime
 
-from flask_login import UserMixin
+LOG_SUFFIX      = '_ccs_data_logger.log'
+g_log_path      = None
 
-from databrowser import login_manager
-from databrowser import cfg
+def initlog(cfg):
+    global g_log_path
+    ts = datetime.datetime.now(datetime.UTC)
+    name = ts.strftime('%Y%m%d%I%M%S') + LOG_SUFFIX
+    if hasattr(cfg,'log_dir') and None is not cfg.log_dir:
+        g_log_path = os.path.join(cfg.log_dir,name)
+    else:
+        g_log_path = name
 
-@login_manager.user_loader
-def load_user(user_id):
-    return Admin()
-
-class Admin(UserMixin):
-    id = 1 
-    username = 'admin'
-    password = cfg.passwd
-
-    def __repr__(self):
-        s = 'name: ' + self.username
-        s += ', phash: ' + self.password
-
+def logmsg(cfg,tag,msg):
+    global g_log_path
+    if None is not g_log_path:
+        with open(g_log_path,'a') as fd:
+            ts = datetime.datetime.now(datetime.UTC)
+            s = ts.strftime('%Y-%m-%d %I:%M:%S ') + '[' + tag + '] ' + msg + '\n'
+            fd.write(s)
 

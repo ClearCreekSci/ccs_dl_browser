@@ -1,6 +1,6 @@
 '''
     forms.py
-    OpenSCAD model for the CCS Data Logger enclosure
+    Web forms for the CCS Data Server
 
     Copyright (C) 2025 Clear Creek Scientific
 

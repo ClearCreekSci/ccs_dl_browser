@@ -1,6 +1,6 @@
 '''
     routes.py
-    OpenSCAD model for the CCS Data Logger enclosure
+    Web routes for the CCS Data Server
 
     Copyright (C) 2025 Clear Creek Scientific
 
@@ -44,6 +44,7 @@ from databrowser import mnfst
  
 from databrowser import bcrypt
 from databrowser.models import Admin
+from databrowser.logging import logmsg
 
 from databrowser import ccs_base
 
@@ -306,7 +307,6 @@ def settings():
     form = forms.SettingsForm()
     #form.errors = list()
     if form.validate_on_submit():
-        print("Settings form validated!");
         if form.units.data == forms.METRIC_VALUE:
             cfg.use_metric = True
         else:
@@ -340,6 +340,7 @@ def downloadfile(name):
     with open(path,'rb') as fd:
         data = fd.read()
     return send_file(BytesIO(data),download_name=name,as_attachment=True) 
+
 
 @app.route('/login',methods=['GET','POST'])
 def login():
