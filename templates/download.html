@@ -14,7 +14,6 @@
                 e.checked = selector.checked;
 	    }
 	}
-
     </script>
     <form method="post" >
 	<div class="info">
@@ -28,7 +27,8 @@
             <input type="checkbox" name="entry" value="{{ file}}" class="entry"/> {{ file }}
 	    </div> 
         {% endfor %}
-        <input type="submit" name="action" value="download"/> <input type="submit" name="action" value="delete"  onclick="return double_check();" />
+        <input type="submit" name="action" value="download"/>
+	<input type="submit" name="action" value="delete"  onclick="return double_check();" />
     </form>
 {% endblock content %}
 

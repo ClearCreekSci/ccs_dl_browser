@@ -279,10 +279,20 @@ def get_photos():
        rv.append((f,'photos/' + f,target))
     return rv
 
-@app.route('/photos')
+@app.route('/photos',methods=['GET','POST'])
+@login_required
 def photos():
+    if 'POST' == request.method:
+        entries = request.form.getlist('entry') 
+        if 'download' == request.form['action']:
+            #return download_files(entries)
+            print('download: ' + str(entries))
+        elif 'delete' == request.form['action']:
+            #delete_files(entries)
+            print('delete: ' + str(entries))
     v = get_photos()
     return render_template('photos.html',title='Photos',data=v)
+
 
 @app.route('/graphs')
 def graphs():
@@ -293,7 +303,7 @@ def graphs():
 def download():
     remove_leftovers()
     if 'POST' == request.method:
-        entries = request.form.getlist('entry') 
+        entries = request.form.getlist('entry')
         if 'download' == request.form['action']:
             return download_files(entries)
         elif 'delete' == request.form['action']:

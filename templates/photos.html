@@ -1,8 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
+    <script type="application/javascript">
+        function double_check() {
+            return confirm('Delete the selected files?');
+	}
+
+        function on_select_all() {
+            const selector = document.getElementById("selectall");
+            const entries = document.getElementsByClassName("entry");
+	    for (let i=0; i < entries.length; i++) {
+		e = entries.item(i);
+		console.log(e.checked);
+                e.checked = selector.checked;
+	    }
+	}
+    </script>
+    <form method="post" >
+    <input type="checkbox" name="selectall" value="selectall" id="selectall" onclick="on_select_all()"/> Select All
+    <input type="submit" name="action" value="download"/>
+    <input type="submit" name="action" value="delete"  onclick="return double_check();" />
+    <hr>
     <div class="grid">
     {% for v in data %}
-    <div class="grid-cell"><a href="{{ url_for('static',filename=v[1] ) }}"><img src="{{ url_for('static',filename=v[1] ) }}" class="thumb" />   {{ v[0] }}   </a></div> 
+    <div class="grid-cell">
+        <input type="checkbox" name="entry" value="{{ v[1] }}" class="entry"/> {{ file }}
+        <a href="{{ url_for('static',filename=v[1] ) }}"><img src="{{ url_for('static',filename=v[1] ) }}" class="thumb" />   {{ v[0] }}   </a>
+    </div> 
     {% endfor %}
     </div>
+    </form>
 {% endblock content %}
