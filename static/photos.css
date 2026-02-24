@@ -1,18 +1,24 @@
 
+/*
 .grid-container {
     display: grid;
-    grid: repeat(auto-fill, 5em) / auto-flow 1fr;
-    height: 100vh;
+    grid: repeat(auto-fill, 6em) / auto-flow 1fr;
     grid-gap: 0.5em;
+    outline: 1px dashed red;
+}
+*/
+
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(128px,1fr));
+    gap: 2em;
 }
 
-.grid-next {
-    display: grid;
-    main {
-        grid: auto-flow 1fr /repeat(auto-fill, 2em);
-    }
-    outline: 1px dashed blue;
+.grid-cell {
 }
+
+
 
 .thumb {
     float: top;
