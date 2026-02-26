@@ -139,11 +139,11 @@ def parse_data():
         fidx += 1
     return rv
 
-def download_files(entries):
-    #global cfg
+def download_csv_files(entries):
+    global cfg
 
     if 0 == len(entries):
-        return render_template('download.html',title='Download',files=os.listdir(cfg.csv_dir))
+        return render_template('csv.html',title='Download CSV Files',files=os.listdir(cfg.csv_dir))
     ts = datetime.now()
     dst = ts.strftime('%Y%m%d%I%M%S') + DOWNLOAD_SUFFIX
     with zipfile.ZipFile(dst,'w',zipfile.ZIP_DEFLATED) as zippy: 
@@ -198,15 +198,16 @@ def download_files(entries):
                 zippy.writestr(os.path.basename(path),data,compress_type=zipfile.ZIP_DEFLATED)
     return send_file(dst,mimetype='zip',download_name=dst,as_attachment=True) 
 
-def delete_files(entries):
+def delete_csv_files(entries):
     for entry in entries:
         path = os.path.join(cfg.csv_dir,entry)
         if os.path.exists(path):
             pathlib.Path.unlink(path)
 
 def remove_leftovers():
-    # When we create the zip files for downloads, they are created in the home directory
-    # and never cleaned up. Look for them here and try to delete them...
+    # When we create the zip files for downloads, they are created in the home 
+    # directory and never cleaned up. Look for them here and try to delete 
+    # them...
     files = os.listdir('.')
     for file in files:
         if file.endswith('.zip'):
@@ -279,36 +280,71 @@ def get_photos():
        rv.append((f,'photos/' + f,target))
     return rv
 
+def download_photos(entries):
+    global cfg
+
+    if 0 == len(entries):
+        return render_template('photos.html',title='Photos',data=get_photos())
+    ts = datetime.now()
+    dst = ts.strftime('%Y%m%d%I%M%S') + DOWNLOAD_SUFFIX
+    with zipfile.ZipFile(dst,'w',zipfile.ZIP_DEFLATED) as zippy: 
+        for entry in entries:
+            data = None
+            path = os.path.join(cfg.photos_dir,entry)
+            with open(path,'rb') as fd:
+                data = fd.read()
+            if None is not data:
+                zippy.writestr(os.path.basename(path),data,compress_type=zipfile.ZIP_DEFLATED)
+    return send_file(dst,mimetype='zip',download_name=dst,as_attachment=True) 
+
 @app.route('/photos',methods=['GET','POST'])
 @login_required
 def photos():
     if 'POST' == request.method:
         entries = request.form.getlist('entry') 
+        file_entries = list()
+        for entry in entries:
+            file_entries.append(os.path.basename(entry))
         if 'download' == request.form['action']:
-            #return download_files(entries)
-            print('download: ' + str(entries))
+            return download_photos(file_entries)
         elif 'delete' == request.form['action']:
-            #delete_files(entries)
-            print('delete: ' + str(entries))
+            delete_photos(file_entries)
     v = get_photos()
     return render_template('photos.html',title='Photos',data=v)
+
+def delete_photos(entries):
+    for entry in entries:
+        # Delete the link to the photo file
+        cwd = os.getcwd()
+        link = os.path.join(cwd,'static/photos')
+        link = os.path.join(link,entry)
+        print('to delete: ' + link)
+        if os.path.exists(link):
+            print('deleting: ' + link)
+            pathlib.Path.unlink(link)
+        # Delete the photo file
+        path = os.path.join(cfg.photos_dir,entry)
+        print('to delete: ' + path)
+        if os.path.exists(path):
+            print('deleting: ' + path)
+            pathlib.Path.unlink(path)
 
 
 @app.route('/graphs')
 def graphs():
     return render_template('graphs.html',title='Graphs')
 
-@app.route('/download',methods=['GET','POST'])
+@app.route('/csv',methods=['GET','POST'])
 @login_required
-def download():
+def csv():
     remove_leftovers()
     if 'POST' == request.method:
         entries = request.form.getlist('entry')
         if 'download' == request.form['action']:
-            return download_files(entries)
+            return download_csv_files(entries)
         elif 'delete' == request.form['action']:
-            delete_files(entries)
-    return render_template('download.html',title='Download',files=os.listdir(cfg.csv_dir))
+            delete_csv_files(entries)
+    return render_template('csv.html',title='Download',files=os.listdir(cfg.csv_dir))
 
 @app.route('/settings',methods=['GET','POST'])
 @login_required
@@ -342,9 +378,9 @@ def about():
         return render_template('about.html',version=mnfst.version,commit=mnfst.commit,title='About')
 
 #FIXME: error checking needs to be done...
-@app.route('/downloadfile/<name>')
+@app.route('/downloadcsv/<name>')
 @login_required
-def downloadfile(name):
+def downloadcsv(name):
     data = None
     path = os.path.join(cfg.csv_dir,name)
     with open(path,'rb') as fd:

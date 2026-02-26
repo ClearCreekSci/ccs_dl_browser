@@ -20,15 +20,19 @@
             Note: Selected files (even if it is just one) will be combined into a .zip file before downloading. Some browsers consider .zip archives to be unsafe. You may have to verify the download.
 	</div>
 
+        <div>
 	<input type="checkbox" name="selectall" value="selectall" id="selectall" onclick="on_select_all()"/> Select All
+        </div>
+        <div>
+        <input type="submit" name="action" value="download_photos"/>
+	<input type="submit" name="action" value="delete_photos"  onclick="return double_check();" />
+        </div>
 	<hr>
         {% for file in files %} 
             <div class="download_entry">
             <input type="checkbox" name="entry" value="{{ file}}" class="entry"/> {{ file }}
 	    </div> 
         {% endfor %}
-        <input type="submit" name="action" value="download"/>
-	<input type="submit" name="action" value="delete"  onclick="return double_check();" />
     </form>
 {% endblock content %}
 
