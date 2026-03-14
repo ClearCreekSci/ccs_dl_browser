@@ -52,57 +52,101 @@ from databrowser import forms
 
 DOWNLOAD_SUFFIX                      = '_ccs_logger.zip'
 
-def get_most_recent_file_path(dirpath):
+def get_timestamp_from_path(path):
+    parts = path.split('_')
+    return ''.join(parts[0:2])
+
+def get_event_from_path(path):
+    parts = path.split('_')
+    return '_'.join(parts[2:4])
+
+def get_event_path_from_list(evnt,lst):
     rv = None
-    most_recent = 0
-    files = os.listdir(dirpath)
+    for v in lst:
+        if evnt in v:
+            rv = v
+            break
+    return rv
+
+def get_csv_events_from_filenames(path):
+    rv = list()
+    files = os.listdir(path)
     for f in files:
+        event = get_event_from_path(f)
+        if False == (event in rv):
+            rv.append(event)
+    return rv
+
+def get_most_recent_file_paths(events):
+    rv = list()
+    most_recent = 0
+    files = os.listdir(events)
+    for f in files:
+        full_path = os.path.join(events,f)
         parts = f.split('_')
-        ts = int(parts[0])
-        if ts > most_recent:
-            most_recent = ts
-            rv = os.path.join(dirpath,f)
+        event = get_event_from_path(f)
+        new_ts = get_timestamp_from_path(f)
+        most_recent_path = get_event_path_from_list(event,rv)
+
+        if None is most_recent_path:
+            rv.append(full_path)
+        else:
+            most_recent_ts = get_timestamp_from_path(most_recent_path)
+            if new_ts > most_recent_ts:
+                try:
+                    idx = rv.index(most_recent_path)
+                    rv[idx] = full_path
+                except ValueError:
+                    pass
     return rv
 
 def parse_most_recent():
-    #global cfg
     rv = list()
-    header = None
-    data = None
-    datafile = get_most_recent_file_path(cfg.csv_dir)
-    if None is not datafile:
-        with open(datafile,'r') as fd:
-            for line in fd:
-                if None is header:
-                    header = line
-                data = line
-        if None is not header and None is not data:
-            header_parts = header.split(',')
-            data_parts = data.split(',')
-            if len(header_parts) == len(data_parts):
-                idx = 0
-                for hp in header_parts:
-                    # Skip the date and time 
-                    if 0 == idx:
+    events = get_csv_events_from_filenames(cfg.csv_dir)
+    print('[parse_most_recent] events: ' + str(events))
+    datafiles = get_most_recent_file_paths(cfg.csv_dir)
+    print('[parse_most_recent] datafiles: ' + str(datafiles))
+    for file in datafiles:
+        header = None
+        data = None
+        if None is not file:
+            with open(file,'r') as fd:
+                for line in fd:
+                    if None is header:
+                        header = line
+                    data = line
+            if None is not header and None is not data:
+                header_parts = header.split(',')
+                data_parts = data.split(',')
+                if len(header_parts) == len(data_parts):
+                    idx = 0
+                    for hp in header_parts:
+                        # Skip the date and time 
+                        if 0 == idx:
+                            idx += 1
+                            continue
+                        hp = hp.strip()
+                        label = ccs_base.getName(hp)
+                        value = ccs_base.getValue(hp,data_parts[idx],cfg.use_metric)
+                        value += ' ' + ccs_base.getUnits(hp,cfg.use_metric)
+                        rv.append((label,value))
                         idx += 1
-                        continue
-                    hp = hp.strip()
-                    label = ccs_base.getName(hp)
-                    value = ccs_base.getValue(hp,data_parts[idx],cfg.use_metric)
-                    value += ' ' + ccs_base.getUnits(hp,cfg.use_metric)
-                    rv.append((label,value))
-                    idx += 1
     return rv
 
+# Returns a list of files
+# Each file contains a list of tuples
+#    The first tuple contains the header information
+#        The header information is a list of UUIDs
+#    The rest of the tuples contain data information
+#        The data information is a list of data points
 def parse_data():
-    #global cfg
     rv = list()
     data = None
     files = os.listdir(cfg.csv_dir)
     files.sort()
-    fidx = 0
 
     for f in files:
+        file_list = list()
         header = None
         datafile = os.path.join(cfg.csv_dir,f)
         with open(datafile,'r') as fd:
@@ -120,8 +164,7 @@ def parse_data():
                         else:
                             s = name + ' ' + ccs_base.getUnits(part,cfg.use_metric)
                             cooked_header.append(s)
-                    if fidx == 0:
-                        rv.append(cooked_header)
+                    file_list.append(cooked_header)
                 else:
                     parts = line.split(',')
                     data = list()
@@ -135,8 +178,8 @@ def parse_data():
                             v = ccs_base.getValue(header[didx],part,cfg.use_metric)
                             data.append(str(v))
                         didx += 1
-                    rv.append(data)
-        fidx += 1
+                    file_list.append(data)
+        rv.append(file_list)
     return rv
 
 def download_csv_files(entries):
@@ -145,7 +188,7 @@ def download_csv_files(entries):
     if 0 == len(entries):
         return render_template('csv.html',title='Download CSV Files',files=os.listdir(cfg.csv_dir))
     ts = datetime.now()
-    dst = ts.strftime('%Y%m%d%I%M%S') + DOWNLOAD_SUFFIX
+    dst = ts.strftime('%Y%m%d%H%M%S') + DOWNLOAD_SUFFIX
     with zipfile.ZipFile(dst,'w',zipfile.ZIP_DEFLATED) as zippy: 
         for entry in entries:
             path = os.path.join(cfg.csv_dir,entry)
@@ -286,7 +329,7 @@ def download_photos(entries):
     if 0 == len(entries):
         return render_template('photos.html',title='Photos',data=get_photos())
     ts = datetime.now()
-    dst = ts.strftime('%Y%m%d%I%M%S') + DOWNLOAD_SUFFIX
+    dst = ts.strftime('%Y%m%d%H%M%S') + DOWNLOAD_SUFFIX
     with zipfile.ZipFile(dst,'w',zipfile.ZIP_DEFLATED) as zippy: 
         for entry in entries:
             data = None

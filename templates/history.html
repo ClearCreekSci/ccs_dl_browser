@@ -3,9 +3,10 @@
     {% if data is none %}
         <div class="data"><span class="data_value">Waiting for first sample to be collected</span></div>
     {% else %}
+        {% for file in data %}
         <table class="history" border="1">
             {% set ns = namespace(firstrow = True) %}
-            {% for row in data %}
+            {% for row in file %}
 	        {% if ns.firstrow %}
                     <tr>
 	            {% for col in row %}
@@ -22,5 +23,6 @@
 	        {% endif %}
             {% endfor %}
         </table>
+	{% endfor %}
     {% endif %}
 {% endblock content %}
