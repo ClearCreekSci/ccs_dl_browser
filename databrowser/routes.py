@@ -389,29 +389,30 @@ def csv():
             delete_csv_files(entries)
     return render_template('csv.html',title='Download',files=os.listdir(cfg.csv_dir))
 
-@app.route('/settings',methods=['GET','POST'])
-@login_required
-def settings():
-    #global cfg
-    form = forms.SettingsForm()
-    #form.errors = list()
-    if form.validate_on_submit():
-        if form.units.data == forms.METRIC_VALUE:
-            cfg.use_metric = True
-        else:
-            cfg.use_metric = False
-        if len(form.password.data) > 0:
-            cfg.passwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-            logout_user()
-        cfg.write()
-        return redirect(url_for('home'))
-    else:
-        if cfg.use_metric:
-            form.units.default = forms.METRIC_VALUE
-        else:
-            form.units.default = forms.IMPERIAL_VALUE
-        form.process()
-    return render_template('settings.html',title='Settings',form=form)
+# FIXME?
+#@app.route('/settings',methods=['GET','POST'])
+#@login_required
+#def settings():
+#    #global cfg
+#    form = forms.SettingsForm()
+#    #form.errors = list()
+#    if form.validate_on_submit():
+#        if form.units.data == forms.METRIC_VALUE:
+#            cfg.use_metric = True
+#        else:
+#            cfg.use_metric = False
+#        if len(form.password.data) > 0:
+#            cfg.passwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+#            logout_user()
+#        cfg.write()
+#        return redirect(url_for('home'))
+#    else:
+#        if cfg.use_metric:
+#            form.units.default = forms.METRIC_VALUE
+#        else:
+#            form.units.default = forms.IMPERIAL_VALUE
+#        form.process()
+#    return render_template('settings.html',title='Settings',form=form)
 
 @app.route('/about')
 def about():
